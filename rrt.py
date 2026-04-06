@@ -1,6 +1,6 @@
 import pygame
 import sys
-import random
+from random import randint as RND
 import math
 from collections import namedtuple
 
@@ -17,14 +17,14 @@ Tree = namedtuple("Tree", "root V E")
 
 
 def random_rectangle(w, h):
-    x = random.randint(0, WIDTH - w)
-    y = random.randint(0, HEIGHT - h)
+    x = RND(0, WIDTH - w)
+    y = RND(0, HEIGHT - h)
     return pygame.Rect(x, y, w, h)
 
 
 def random_point():
-    x = random.randint(CLOSE, WIDTH - CLOSE)
-    y = random.randint(CLOSE, HEIGHT - CLOSE)
+    x = RND(CLOSE, WIDTH - CLOSE)
+    y = RND(CLOSE, HEIGHT - CLOSE)
     return Point(x, y)
 
 
@@ -37,7 +37,9 @@ def sample_tree_node(tree, obstacles, d=50):
     candidates = sorted([(dist(node, p), node) for node in tree.V])
     for _, node in candidates:
         direction = math.atan2(p.y - node.y, p.x - node.x)
-        new_point = Point(int(node.x + d * math.cos(direction)), int(node.y + d * math.sin(direction)))
+        new_point = Point(
+            int(node.x + d * math.cos(direction)), int(node.y + d * math.sin(direction))
+        )
         if not any(obstacle.collidepoint(*new_point) for obstacle in obstacles):
             return new_point, node
 
@@ -72,16 +74,21 @@ def get_path(start, target, tree):
 
 ########
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Pygame Canvas")
+pygame.display.set_caption("Rapidly-Exploring Random Tree Search")
+
+RND_RECT = lambda: (RND(10, WIDTH // 4), RND(10, HEIGHT // 4))
 
 running = True
-obstacles = [random_rectangle(random.randint(10, WIDTH // 4), random.randint(10, HEIGHT // 4)) for _ in range(10)]
+obstacles = [random_rectangle(*RND_RECT()) for _ in range(10)]
 start = random_point()
 while any(obstacle.collidepoint(*start) for obstacle in obstacles):
     start = random_point()
 
 target = random_point()
-while any(obstacle.collidepoint(*target) for obstacle in obstacles) or dist(start, target) < 10 * CLOSE:
+while (
+    any(obstacle.collidepoint(*target) for obstacle in obstacles)
+    or dist(start, target) < 10 * CLOSE
+):
     target = random_point()
 
 
@@ -122,6 +129,7 @@ while running:
     pygame.draw.circle(screen, (255, 0, 0), target, 10)  # Target point in red
 
     pygame.display.flip()
+    pygame.time.wait(10)
 print("OUT OF THE LOOP")
 pygame.quit()
 print("Done quit")
