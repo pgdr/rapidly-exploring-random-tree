@@ -12,3 +12,6 @@ is found, it is highlighted.
 - Simple nearest-extension step
 - Path reconstruction and drawing once the goal is reached
 - Live visualization in a Pygame window
+
+
+![](rrt.png)
